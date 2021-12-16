@@ -8,7 +8,7 @@ Utilizing SecureX to automate the updating of SNA Host Groups
 
 ## Rationale
 
-We need to easily update host groups in SNA for log4j vulnerabilities from any of many data sources
+We need to easily update host groups in SNA for log4j vulnerabilities from any data source reachable via http
 
 ## Required Dependencies
 
