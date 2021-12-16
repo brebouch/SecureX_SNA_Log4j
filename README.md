@@ -73,6 +73,10 @@ Run the main.py file with the appropriate data and flags as noted below:
  * Secure Network Analytics Password: -p Optional
  * Secure Network Analytics Host Group: -g Optional
 
+```
+main.py https://blog.talosintelligence.com/2021/12/apache-log4j-rce-vulnerability.html -c securex-api-client -s securex-api-secret -i SNA-IP-Address -u sna-admin-user -p sna-admin-password -g sna-destination-host-group-name
+```
+
 ### Script execution flow
 
 1. Splits provided data source IP's and URL's
@@ -82,6 +86,7 @@ Run the main.py file with the appropriate data and flags as noted below:
 5. Performs lookup within CTR for all domain IOC's judgements
 6. For Suspicious or Malicious domains, performs DNS lookup to identify IP addresses
 7. Identified IP addresses added to malicious IP list
+8. Write output to malicious_ip.txt
 
 Optional SNA Tasks
 
