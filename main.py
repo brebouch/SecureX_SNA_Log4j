@@ -19,7 +19,8 @@ parser.add_argument('-u', help='Comma deliminated list of pages to scrape for ob
 parser.add_argument('-s', help='Update Secure Network Analytics Host Group IPs with those found in url lookup',
                     action='store_true')
 parser.add_argument('-q', help='SQL query for orbital to execute', required=False)
-parser.add_argument('-n', help='Comma seperated list of nodes for Orbital to query, defaults to all', required=False)
+parser.add_argument('-n', help='Comma seperated list of nodes for Orbital to query, defaults to all, no spaces',
+                    required=False)
 
 
 lookup_urls = []
@@ -171,7 +172,7 @@ if __name__ == '__main__':
             sys.exit()
         securex = utilities.cfg['securex']
         token = get_token(securex['client_id'], securex['api_key'])
-        url_ioc_lookup(args['-u'])
+        url_ioc_lookup(args['u'])
         if utilities.verify_config('sna') and args['s']:
             sna_cfg = utilities.cfg['sna']
             sna = sna.NetworkAnalytics(sna_cfg['hostname'], sna_cfg['user'], sna_cfg['password'])

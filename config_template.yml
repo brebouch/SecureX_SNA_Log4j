@@ -1,9 +1,15 @@
 securex:
   api_key: ''
   client_id: ''
-  ctr_hostname: visibility.amp.cisco.com
-  orbital_hostname: orbital.amp.cisco.com
-  private_intelligence: private.intel.amp.cisco.com
+  hostname: visibility.amp.cisco.com
+private_intel:
+  api_key: ''
+  client_id: ''
+  hostname: private.intel.amp.cisco.com
+orbital:
+  api_key: ''
+  client_id: ''
+  hostname: orbital.amp.cisco.com
 secure_endpoint:
   api_key: ''
   client_id: ''
@@ -16,6 +22,7 @@ sna:
   hostname: ''
   password: ''
   user: ''
+  hostgroup: ''
 umbrella:
   hostname: s-platform.api.opendns.com
   key: [created at https://dashboard.umbrella.com/o/2027680/#/admin/apikeys]
