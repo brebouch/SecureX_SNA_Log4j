@@ -7,10 +7,11 @@
 *.code-workspace
 .idea
 malicious_ips.*
-orbital.json
+orbital_data.json
 config.yml
 # Local History for Visual Studio Code
 .history/
+*.log
 
 ### Xcode template
 # Xcode

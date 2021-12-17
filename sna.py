@@ -2,6 +2,7 @@ import requests
 import json
 import sys
 
+
 try:
     requests.packages.urllib3.disable_warnings()
 except:
@@ -10,16 +11,11 @@ except:
 
 class NetworkAnalytics:
 
-    username = ""
-    password = ""
-    host = ""
     host_group = ''
     host_group_name = ''
     tenant = ""
     XSRF_HEADER_NAME = 'X-XSRF-TOKEN'
     session = ''
-
-    url = ''
 
     def get_session(self):
         data = {'username': self.username, 'password': self.password}
@@ -30,29 +26,32 @@ class NetworkAnalytics:
                 if cookie.name == 'XSRF-TOKEN':
                     api_session.headers.update({self.XSRF_HEADER_NAME: cookie.value})
             api_session.cookies = res.cookies
-            print('Secure Network Analytics Session Opened Successfully')
+            self.logger.info('Secure Network Analytics Session Opened Successfully')
             self.session = api_session
             return
-        print('Issue obtaining session token, check credentials and try again')
+        self.logger.info('Issue obtaining session token, check credentials and try again')
+        self.logger.debug(str(res) + ' - ' + res.text)
         sys.exit()
 
     def get_tenant(self):
         res = self.session.get(self.url + '/sw-reporting/v1/tenants/', verify=False)
         if res.status_code == 200:
             data = json.loads(res.content)
-            print('Obtained Tenant ID')
+            self.logger.info('Obtained Tenant ID')
             self.tenant = str(data['data'][0]['id'])
             return
-        print('Issue obtaining tenant ID, check credentials and try again')
+        self.logger.info('Issue obtaining tenant ID, check credentials and try again')
+        self.logger.debug(str(res) + ' - ' + res.text)
         sys.exit()
 
     def get_hostgroup(self, hg_id):
         hg_url = self.url + '/smc-configuration/rest/v1/tenants/' + self.tenant + '/tags/' + hg_id
         res = self.session.get(hg_url, verify=False)
         if res.status_code == 200:
-            print('Obtained Host Group Data')
+            self.logger.info('Obtained Host Group Data')
             return json.loads(res.content)['data']
-        print('Issue obtaining host group, check configuration and try again')
+        self.logger.info('Issue obtaining host group, check configuration and try again')
+        self.logger.debug(str(res) + ' - ' + res.text)
         sys.exit()
 
     def get_hostgroup_by_name(self):
@@ -63,8 +62,10 @@ class NetworkAnalytics:
             for d in data['data']:
                 if d['name'] == self.host_group_name:
                     self.host_group = self.get_hostgroup(str(d['id']))
+                    self.logger.info('Found Host Group: ' + self.host_group_name + ' ID: ' + str(d['id']))
                     return
-        print('Issue obtaining host group, check configuration and try again')
+        self.logger.info('Issue obtaining host group, check configuration and try again')
+        self.logger.debug(str(res) + ' - ' + res.text)
         sys.exit()
 
     def update_hostgroup(self, ips):
@@ -79,17 +80,21 @@ class NetworkAnalytics:
         data = json.dumps(self.host_group)
         res = self.session.put(hg_url, data=data, headers=headers, verify=False)
         if res.status_code == 200:
-            print('Host Group Successfully Updated')
+            self.logger.info('Host Group Successfully Updated')
+        else:
+            self.logger.info('Issue Updating Host Group')
+            self.logger.debug(str(res) + ' - ' + res.text)
 
     def set_host_group(self, hg):
         self.host_group_name = hg
         self.get_hostgroup_by_name()
 
-    def __init__(self, ip, user, passwd):
+    def __init__(self, ip, user, passwd, logger):
         self.host = ip
         self.url = 'https://' + ip
         self.username = user
         self.password = passwd
+        self.logger = logger
         self.get_session()
         self.get_tenant()
 
