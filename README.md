@@ -59,19 +59,22 @@ the [requirements.txt](requirements.txt) file:
 pip install --upgrade --requirement requirements.txt
 ```
 
+### Configuration
+
+All configuration is expected in a config.yml file. An example template file has been provided that needs to be 
+populated with required information and **renamed to config.yml**
+
 ## Step 2: Running Application
 
 Run the main.py file with the appropriate data and flags as noted below:
 
 #### The required arguments and flags are below
 
- * Urls to scrape for IOC's: Comma seperated list of IP addresses and hostnames
- * SecureX API Client ID: -c 
- * SecureX API Client Secret: -s 
- * Secure Network Analytics Manager IP: -i Optional
- * Secure Network Analytics Username: -u Optional
- * Secure Network Analytics Password: -p Optional
- * Secure Network Analytics Host Group: -g Optional
+ * Operation: full_lookup, url_lookup, orbital_lookup
+ * -u: Comma deliminated list of pages to scrape for observables, no spaces
+ * -s: **Optional** Update Secure Network Analytics Host Group IPs with those found in url lookup
+ * -q: **Optional** SQL query for orbital to execute
+ * -n: **Optional** Comma seperated list of nodes for Orbital to query, defaults to all, no spaces
 
 ```
 main.py https://blog.talosintelligence.com/2021/12/apache-log4j-rce-vulnerability.html -c securex-api-client -s securex-api-secret -i SNA-IP-Address -u sna-admin-user -p sna-admin-password -g sna-destination-host-group-name
