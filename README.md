@@ -77,7 +77,7 @@ Run the main.py file with the appropriate data and flags as noted below:
  * -n: **Optional** Comma seperated list of nodes for Orbital to query, defaults to all, no spaces
 
 ```
-main.py https://blog.talosintelligence.com/2021/12/apache-log4j-rce-vulnerability.html -c securex-api-client -s securex-api-secret -i SNA-IP-Address -u sna-admin-user -p sna-admin-password -g sna-destination-host-group-name
+main.py full_lookup -u https://s3.amazonaws.com/talos-intelligence-site/production/document_files/files/000/095/701/original/IOCs_20211216.txt?1639690764,https://s3.amazonaws.com/talos-intelligence-site/production/document_files/files/000/095/700/original/Dec1521IOCs.txt?1639683730 -s -q "SELECT DISTINCT pos.pid, p.name, p.cmdline, pos.local_address, pos.local_port, pos.remote_address, pos.remote_port FROM processes p JOIN process_open_sockets pos USING (pid) WHERE pos.remote_address NOT IN (\"\", \"0.0.0.0\", \"127.0.0.1\", \"::\", \"::1\", \"0\");"
 ```
 
 ### Script execution flow
