@@ -1,4 +1,6 @@
+#!/usr/bin/python3.8
 # Cisco Secure Network Analytics log4j Responder
+import sys
 import dns.resolver
 import requests
 import argparse
@@ -6,17 +8,18 @@ import base64
 import json
 import re
 from dns import resolver
+import utilities
 import sna
+import orbital
 
 
-parser = argparse.ArgumentParser(description='SecureX Relay Deployment Tool.', prog='SecureX Relay Deployer')
-parser.add_argument('o', help='Comma deliminated list of pages to scrape for observables, no spaces')
-parser.add_argument('-c', help='SecureX API Client ID. Example: "-i client_......"')
-parser.add_argument('-s', help='SecureX API Client Secret')
-parser.add_argument('-i', help='Secure Network Analytics IP address', required=False)
-parser.add_argument('-u', help='Secure Network Analytics username', required=False)
-parser.add_argument('-p', help='Secure Network Analytics password', required=False)
-parser.add_argument('-g', help='Secure Network Analytics destination Host Group', required=False)
+parser = argparse.ArgumentParser(description='SecureX Log4j Responder', add_help=False)
+parser.add_argument('o', help='Lookup operation to be performed: full_lookup, url_lookup, orbital_lookup')
+parser.add_argument('-u', help='Comma deliminated list of pages to scrape for observables, no spaces')
+parser.add_argument('-s', help='Update Secure Network Analytics Host Group IPs with those found in url lookup',
+                    action='store_true')
+parser.add_argument('-q', help='SQL query for orbital to execute', required=False)
+parser.add_argument('-n', help='Comma seperated list of nodes for Orbital to query, defaults to all', required=False)
 
 
 lookup_urls = []
@@ -99,9 +102,9 @@ def update_malicious_ip(ip):
         malicious_ips.append(ip)
 
 
-def log_update():
-    with open('malicious_ips.txt', 'w') as logger:
-        logger.write(json.dumps({'malicious_ips': malicious_ips}, indent=4, sort_keys=True))
+def log_update(log_name, log_json):
+    with open(log_name, 'w') as logger:
+        logger.write(json.dumps(log_json, indent=4, sort_keys=True))
 
 
 def parse_observables(observables):
@@ -114,18 +117,23 @@ def parse_observables(observables):
     if lookup_domains:
         lookup_identified_domains(lookup_domains)
     if malicious_ips:
-        log_update()
+        log_update('malicious_ips.json', {'malicious_ips': malicious_ips})
 
 
 def lookup_identified_domains(domains):
     deliberations = ctr_deliberate(domains)
     for d in deliberations['data']:
-        if d['data']['verdicts']['count'] > 0:
-            for v in d['data']['verdicts']['docs']:
-                if v['disposition'] == 2 or v['disposition'] == 3:
-                    ips = ip_lookup(d['data']['verdicts']['observable']['value'])
-                    for i in ips:
-                        malicious_ips.append(i.address)
+        try:
+            if 'verdicts' not in d['data'].keys():
+                continue
+            if d['data']['verdicts']['count'] > 0:
+                for v in d['data']['verdicts']['docs']:
+                    if v['disposition'] == 2 or v['disposition'] == 3:
+                        ips = ip_lookup(d['data']['verdicts']['observable']['value'])
+                        for i in ips:
+                            malicious_ips.append(i.address)
+        except Exception as e:
+            print(e)
 
 
 def strip_html(page):
@@ -143,25 +151,44 @@ def lookup_pages():
     for u in lookup_urls:
         if not u.startswith('http'):
             u = 'https://' + u
-        try:
-            page = get_page_data(u)
-            if page is None:
-                missed_urls.append(u)
-                continue
-            parse_observables(ctr_inspect(strip_html(page)))
-        except:
+        page = get_page_data(u)
+        if page is None:
             missed_urls.append(u)
+            continue
+        parse_observables(ctr_inspect(strip_html(page)))
+
+
+def url_ioc_lookup(pages):
+    get_lookup_pages(pages)
+    lookup_pages()
 
 
 if __name__ == '__main__':
     args = vars(parser.parse_args())
-    token = get_token(args['c'], args['s'])
-    get_lookup_pages(args['o'])
-    lookup_pages()
-    if 'i' in args.keys() and 'u' in args.keys() and 'p' in args.keys() and 'g' in args.keys():
-        sna = sna.NetworkAnalytics(args['i'], args['u'], args['p'])
-        sna.set_host_group(args['g'])
-        sna.update_hostgroup(malicious_ips)
+    if args['o'] == 'full_lookup' or args['o'] == 'url_lookup':
+        if not utilities.verify_config('securex'):
+            print('SecureX API credentials must be configured in order to proceed')
+            sys.exit()
+        securex = utilities.cfg['securex']
+        token = get_token(securex['client_id'], securex['api_key'])
+        url_ioc_lookup(args['-u'])
+        if utilities.verify_config('sna') and args['s']:
+            sna_cfg = utilities.cfg['sna']
+            sna = sna.NetworkAnalytics(sna_cfg['hostname'], sna_cfg['user'], sna_cfg['password'])
+            sna.set_host_group(sna_cfg['hostgroup'])
+            sna.update_hostgroup(malicious_ips)
+    if args['o'] == 'full_lookup' or args['o'] == 'orbital_lookup'and utilities.verify_config('orbital'):
+        orb = utilities.cfg['orbital']
+        o = orbital.Orbital(orb['client_id'], orb['api_key'])
+        if args['n']:
+            for n in args['n'].split(','):
+                o.add_node(n)
+        else:
+            o.add_node('all')
+        response = o.create_orbital_query()
+        results = o.get_results(response['ID'])
+        print(results)
+        log_update('orbital_data.json', results)
 
 
 

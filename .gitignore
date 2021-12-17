@@ -6,7 +6,9 @@
 !.vscode/extensions.json
 *.code-workspace
 .idea
-malicious_ips.txt
+malicious_ips.*
+orbital.json
+config.yml
 # Local History for Visual Studio Code
 .history/
 
