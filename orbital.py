@@ -2,7 +2,6 @@ import json
 import requests
 import base64
 import time
-import sys
 
 
 class Orbital:
@@ -15,7 +14,6 @@ class Orbital:
     token = None
 
     queries = [
-        'SELECT DISTINCT pos.pid, p.name, p.cmdline, pos.local_address, pos.local_port, pos.remote_address, pos.remote_port FROM processes p JOIN process_open_sockets pos USING (pid) WHERE pos.remote_address NOT IN ("", "0.0.0.0", "127.0.0.1", "::", "::1", "0"); '
         'SELECT pid, name, path, cmdline FROM processes WHERE name LIKE "%log4j%" AND parent LIKE "%java%";',
         'SELECT pid, path FROM process_open_files WHERE path LIKE \'%log4j%.jar\';',
         "SELECT name, version, source FROM deb_packages WHERE name LIKE '%log4j%';",
@@ -93,6 +91,8 @@ class Orbital:
 
     def parse_results(self, results):
         response = []
+        if not results:
+            return
         for res in range(len(results['results'])):
             r = results['results'][res]
             response.append({'hostinfo': r['hostinfo'], 'hits': []})

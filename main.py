@@ -186,10 +186,11 @@ if __name__ == '__main__':
                 o.add_node(n)
         else:
             o.add_node('all')
+        if args['q']:
+            o.add_os_query(args['q'])
         response = o.create_orbital_query()
         results = o.get_results(response['ID'])
-        print(results)
-        log_update('orbital_data.json', results)
+        log_update('orbital_data.json', {'results' : results})
 
 
 
