@@ -14,6 +14,10 @@ class Orbital:
     token = None
 
     queries = [
+        'SELECT name, value FROM ( SELECT name, value FROM orbital_environment UNION SELECT name AS "name", data AS "value" FROM registry WHERE key LIKE "HKEY_USERS\%\Environment") AS t WHERE value like "%java%"; ',
+        'SELECT p2.name AS parent_process, p1.pid, p1.name, p1.path, p1.cmdline, p1.state, p1.uid FROM processes p1 JOIN processes p2 ON p1.pid=p2.parent WHERE p1.name like "%java%"; ',
+        'SELECT path, matches, count, strings FROM yara WHERE path IN ( SELECT path FROM file WHERE (directory LIKE "C:\Program Files\%" AND filename LIKE "%.jar") OR (directory LIKE "C:\Program Files (x86)\%" AND filename LIKE "%.jar") ) AND sigrule=\'rule suspicious_log4j_string { strings: $s1="JndiLookup.class" wide ascii nocase condition: $s1}\'; ',
+        'SELECT name, version, install_location, install_source, install_date FROM programs WHERE (name LIKE "%log4j%" OR name LIKE "%java%"); ',
         'SELECT pid, name, path, cmdline FROM processes WHERE name LIKE "%log4j%" AND parent LIKE "%java%";',
         'SELECT pid, path FROM process_open_files WHERE path LIKE \'%log4j%.jar\';',
         "SELECT name, version, source FROM deb_packages WHERE name LIKE '%log4j%';",
