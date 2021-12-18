@@ -8,7 +8,7 @@
 .idea
 malicious_ips.*
 orbital_data.json
-config.yml
+config_lab.yml
 # Local History for Visual Studio Code
 .history/
 *.log

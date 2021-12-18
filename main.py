@@ -1,5 +1,6 @@
 #!/usr/bin/python3.8
 # Cisco Secure Network Analytics log4j Responder
+import logging
 import sys
 import dns.resolver
 import requests
@@ -12,7 +13,8 @@ import utilities
 import sna
 import orbital
 
-logger = utilities.get_logger('app')
+utils = utilities.CFG()
+logger = utils.get_logger('app')
 
 
 parser = argparse.ArgumentParser(description='SecureX Log4j Responder', add_help=False)
@@ -23,6 +25,8 @@ parser.add_argument('-s', help='Update Secure Network Analytics Host Group IPs w
 parser.add_argument('-q', help='SQL query for orbital to execute', required=False)
 parser.add_argument('-n', help='Comma seperated list of nodes for Orbital to query, defaults to all, no spaces',
                     required=False)
+parser.add_argument('--config', help='Path of external config file if not using default', required=False)
+parser.add_argument('--debug', help='Path of external config file if not using default', action='store_true')
 
 
 lookup_urls = []
@@ -185,23 +189,40 @@ def url_ioc_lookup(pages):
     lookup_pages()
 
 
+def get_config(cfg_path):
+    try:
+        if cfg_path:
+            utils.load_config(args['config'])
+            logger.info('Credentials loaded from file: ' + args['config'])
+        else:
+            utils.load_config()
+            logger.info('Credentials loaded from default config.yaml')
+    except Exception as e:
+        logger.critical('Could not load configuration due to error: ' + str(e))
+        logger.critical('Closing Application')
+
+
 if __name__ == '__main__':
     args = vars(parser.parse_args())
+    if args['debug']:
+        logger.setLevel(logging.DEBUG)
+    get_config(args['config'])
+    logger.info('Performing operation: ' + args['o'])
     if args['o'] == 'full_lookup' or args['o'] == 'url_lookup':
-        if not utilities.verify_config('securex'):
+        if not utils.verify_config('securex'):
             logger.critical('SecureX API credentials must be configured in order to proceed')
             sys.exit()
-        securex = utilities.cfg['securex']
+        securex = utils.cfg['securex']
         token = get_token(securex['client_id'], securex['client_password'])
         url_ioc_lookup(args['u'])
-        if utilities.verify_config('sna') and args['s']:
-            sna_cfg = utilities.cfg['sna']
+        if utils.verify_config('sna') and args['s']:
+            sna_cfg = utils.cfg['sna']
             logger.info('Obtained Secure Network Analytics credentials')
             sna = sna.NetworkAnalytics(sna_cfg['hostname'], sna_cfg['user'], sna_cfg['password'], logger)
             sna.set_host_group(sna_cfg['hostgroup'])
             sna.update_hostgroup(malicious_ips)
-    if args['o'] == 'full_lookup' or args['o'] == 'orbital_lookup'and utilities.verify_config('orbital'):
-        orb = utilities.cfg['orbital']
+    if (args['o'] == 'full_lookup' or args['o'] == 'orbital_lookup') and utils.verify_config('orbital'):
+        orb = utils.cfg['orbital']
         o = orbital.Orbital(orb['client_id'], orb['client_password'], logger)
         if args['n']:
             for n in args['n'].split(','):
@@ -212,7 +233,7 @@ if __name__ == '__main__':
             o.add_os_query(args['q'])
         response = o.create_orbital_query()
         results = o.get_results(response['ID'])
-        log_update('orbital_data.json', {'results' : results})
+        log_update('orbital_data.json', {'results': results})
         logger.info('Results logged to orbital_data.json')
     logger.info('Actions complete, exiting application')
 
