@@ -1,18 +1,18 @@
 securex:
-  api_key: ''
-  client_id: ''
+    client_id: ''
+  client_password: ''
   hostname: visibility.amp.cisco.com
 private_intel:
-  api_key: ''
   client_id: ''
+  client_password: ''
   hostname: private.intel.amp.cisco.com
 orbital:
-  api_key: ''
   client_id: ''
+  client_password: ''
   hostname: orbital.amp.cisco.com
 secure_endpoint:
-  api_key: ''
   client_id: ''
+  client_password: ''
   amp_hostname: api.amp.cisco.com
 fmc:
   hostname: ''

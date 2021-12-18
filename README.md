@@ -12,11 +12,39 @@ We need to easily update host groups in SNA for log4j vulnerabilities from any d
 
 ## Required Dependencies
 
-* System running python3 and ability to install packages - Required
-* SecureX instance with API credentials - Required
-* Secure Network Analytics deployment with admin user access - Optional
+* **Required** - System running python3 and ability to install packages - Required
+* **Required** - SecureX instance with API credentials - Required
+* **Optional** - Secure Network Analytics deployment with admin user access 
+* **Optional** - Orbital API Credentials
+
+### Obtaining Credentials
+
+#### SecureX, Orbital, Private Intelligence
+
+1. Log into SecureX and go to 
+2. Click Administration Tab at the top of the screen
+3. On the left side navigation select API Clients
+4. Click Generate API Client
+5. Provide Appropriate Permissions
+   * Enrich:read
+   * Inspect:read
+   * Investigation
+   * Orbital
+6. Add client_id and client_password to appropriate configuration option
+* Same credentials for SecureX, Orbital, & Private Intelligence in config or separate per function
+
+#### Secure Network Analytics
+
+1. Default Admin or any user with administrative permissions
+2. Add the hostname or IP of the SNA Manager
+3. Add the name of the pre-created Host Group for external log4j IP's
 
 ## Application Setup
+
+### Configuration
+
+All configuration is expected in a config.yml file. An example template file has been provided that needs to be 
+populated with required information and **renamed to config.yml**
 
 
 ## Step 1: Requirements Installation
@@ -58,11 +86,6 @@ the [requirements.txt](requirements.txt) file:
 ```
 pip install --upgrade --requirement requirements.txt
 ```
-
-### Configuration
-
-All configuration is expected in a config.yml file. An example template file has been provided that needs to be 
-populated with required information and **renamed to config.yml**
 
 ## Step 2: Running Application
 

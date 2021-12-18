@@ -192,7 +192,7 @@ if __name__ == '__main__':
             logger.critical('SecureX API credentials must be configured in order to proceed')
             sys.exit()
         securex = utilities.cfg['securex']
-        token = get_token(securex['client_id'], securex['api_key'])
+        token = get_token(securex['client_id'], securex['client_password'])
         url_ioc_lookup(args['u'])
         if utilities.verify_config('sna') and args['s']:
             sna_cfg = utilities.cfg['sna']
@@ -202,7 +202,7 @@ if __name__ == '__main__':
             sna.update_hostgroup(malicious_ips)
     if args['o'] == 'full_lookup' or args['o'] == 'orbital_lookup'and utilities.verify_config('orbital'):
         orb = utilities.cfg['orbital']
-        o = orbital.Orbital(orb['client_id'], orb['api_key'], logger)
+        o = orbital.Orbital(orb['client_id'], orb['client_password'], logger)
         if args['n']:
             for n in args['n'].split(','):
                 o.add_node(n)
