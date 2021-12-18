@@ -19,7 +19,7 @@ We need to easily update host groups in SNA for log4j vulnerabilities from any d
 
 ### Obtaining Credentials
 
-#### SecureX, Orbital, Private Intelligence
+#### SecureX, Orbital
 
 1. Log into SecureX and go to 
 2. Click Administration Tab at the top of the screen
@@ -31,7 +31,7 @@ We need to easily update host groups in SNA for log4j vulnerabilities from any d
    * Investigation
    * Orbital
 6. Add client_id and client_password to appropriate configuration option
-* Same credentials for SecureX, Orbital, & Private Intelligence in config or separate per function
+* Same credentials for SecureX & Orbital in config or separate per function
 
 #### Secure Network Analytics
 
@@ -43,8 +43,29 @@ We need to easily update host groups in SNA for log4j vulnerabilities from any d
 
 ### Configuration
 
-All configuration is expected in a config.yml file. An example template file has been provided that needs to be 
-populated with required information and **renamed to config.yml**
+All configuration is contained in config.yml file. 
+
+Example format:
+
+```yaml
+securex:
+  client_id: 'client-**************'
+  client_password: '***************'
+  hostname: visibility.amp.cisco.com
+private_intel:
+  client_id: 'client-**************'
+  client_password: '***************'
+  hostname: private.intel.amp.cisco.com
+orbital:
+  client_id: 'client-**************'
+  client_password: '***************'
+  hostname: orbital.amp.cisco.com
+sna:
+  hostname: 'smc.example-domain.com'
+  user: 'admin-user'
+  password: 'admin-password'
+  hostgroup: 'log4j'
+```
 
 
 ## Step 1: Requirements Installation

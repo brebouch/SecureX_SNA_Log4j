@@ -2,31 +2,12 @@ securex:
     client_id: ''
   client_password: ''
   hostname: visibility.amp.cisco.com
-private_intel:
-  client_id: ''
-  client_password: ''
-  hostname: private.intel.amp.cisco.com
 orbital:
   client_id: ''
   client_password: ''
   hostname: orbital.amp.cisco.com
-secure_endpoint:
-  client_id: ''
-  client_password: ''
-  amp_hostname: api.amp.cisco.com
-fmc:
-  hostname: ''
-  password: ''
-  user: ''
 sna:
   hostname: ''
-  password: ''
   user: ''
+  password: ''
   hostgroup: ''
-umbrella:
-  hostname: s-platform.api.opendns.com
-  key: [created at https://dashboard.umbrella.com/o/2027680/#/admin/apikeys]
-  secret: [created at https://dashboard.umbrella.com/o/2027680/#/admin/apikeys]
-webex_teams:
-  token: [found at https://developer.webex.com/docs/api/getting-started]
-  irt_room: [Replace with the Room ID for your Incident Reponse Team Room]
