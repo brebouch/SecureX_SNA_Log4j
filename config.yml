@@ -1,5 +1,5 @@
 securex:
-    client_id: ''
+  client_id: ''
   client_password: ''
   hostname: visibility.amp.cisco.com
 orbital:
